@@ -166,7 +166,7 @@ wheels = [
 
 [[package]]
 name = "dijay"
-version = "0.3.21"
+version = "0.3.27"
 source = { editable = "." }
 dependencies = [
     { name = "ruff" },
