@@ -39,6 +39,24 @@ class CatsService:
         return ["Meow", "Purr"]
 ```
 
+You can also pass an **abstract class** as a token to `@injectable`. This registers the concrete class under the abstract token, enabling dependency inversion:
+
+```python
+from abc import ABC, abstractmethod
+from dijay import injectable
+
+class Database(ABC):
+    @abstractmethod
+    async def query(self, sql: str) -> list: ...
+
+@injectable(Database)
+class PostgresDatabase(Database):
+    async def query(self, sql: str) -> list:
+        ...
+```
+
+Any provider that depends on `Database` will automatically receive the `PostgresDatabase` instance.
+
 ### 2. Create a Module
 
 ```python
