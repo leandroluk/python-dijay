@@ -5,8 +5,9 @@ site_url = "https://leandroluk.github.io/python-dijay/"
 repo_url = "https://github.com/leandroluk/python-dijay"
 repo_name = "leandroluk/python-dijay"
 
-[theme]
+[project.theme]
 name = "material"
+favicon = "assets/logo.svg"
 palette = [
     { scheme = "slate", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-4", name = "Switch to light mode" } },
     { scheme = "default", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-7", name = "Switch to dark mode" } },
@@ -20,7 +21,8 @@ features = [
     "search.highlight",
 ]
 
-[theme.icon]
+[project.theme.icon]
+logo = "lucide/headphones"
 repo = "fontawesome/brands/github"
 
 [plugins.mkdocstrings.handlers.python]

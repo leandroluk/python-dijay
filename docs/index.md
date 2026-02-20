@@ -2,7 +2,7 @@
 icon: lucide/rocket
 ---
 
-# 🎧 dijay
+# Home
 
 **Drop the beat on your dependencies.**
 
