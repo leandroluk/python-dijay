@@ -15,11 +15,14 @@ dependencies = [
     "dijay",
 ]
 
-[project.scripts]
-fastapi-recipe-ddd = "src.main:run"
 
 [tool.setuptools]
 packages = ["src"]
 
 [tool.uv.sources]
 dijay = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "uvicorn>=0.41.0",
+]

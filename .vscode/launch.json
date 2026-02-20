@@ -5,11 +5,12 @@
             "name": "recipe:fastapi-ddd",
             "type": "debugpy",
             "request": "launch",
-            "module": "src.main",
+            "module": "src",
             "cwd": "${workspaceFolder}/recipes/fastapi-ddd",
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/recipes/fastapi-ddd;${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}/recipes/fastapi-ddd;${workspaceFolder}",
+                "HTTP_ENABLE_RELOAD": "false"
             }
         }
     ]

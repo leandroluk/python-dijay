@@ -166,7 +166,7 @@ wheels = [
 
 [[package]]
 name = "dijay"
-version = "0.3.16"
+version = "0.3.18"
 source = { editable = "." }
 dependencies = [
     { name = "ruff" },
@@ -228,6 +228,11 @@ dependencies = [
     { name = "watchfiles" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "uvicorn" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "dijay", editable = "." },
@@ -235,6 +240,9 @@ requires-dist = [
     { name = "uvicorn" },
     { name = "watchfiles" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "uvicorn", specifier = ">=0.41.0" }]
 
 [[package]]
 name = "ghp-import"

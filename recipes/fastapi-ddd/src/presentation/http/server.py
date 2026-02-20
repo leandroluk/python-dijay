@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from dijay import Container, injectable
+from dijay import injectable
 
 from .config import HttpConfig
 from .todo import router as todo_router
@@ -11,7 +11,7 @@ class HttpServer:
     config: HttpConfig
     app: FastAPI
 
-    def __init__(self, config: HttpConfig, container: Container):
+    def __init__(self, config: HttpConfig):
         self.config = config
         self.app = FastAPI(
             title="Todo API",
@@ -19,7 +19,6 @@ class HttpServer:
             docs_url=f"{self.config.path}docs",
             redoc_url=f"{self.config.path}redoc",
         )
-        self.app.state.container = container
         self.app.openapi = self.custom_openapi
         self.apply_routes()
 
