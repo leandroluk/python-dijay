@@ -30,8 +30,14 @@ jobs:
       - name: Lint and Format Check
         run: make lint
 
-      - name: Run tests
-        run: make test
+      - name: Run tests with coverage
+        run: make test-cov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          fail_ci_if_error: false
 
       - name: Build package
         run: make build

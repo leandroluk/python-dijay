@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := setup
 
-.PHONY: setup install test build publish clean lint format
+.PHONY: setup install test test-cov build publish clean lint format
 
 setup:
 	uv venv --python 3.14
@@ -20,6 +20,9 @@ format:
 
 test:
 	uv run pytest
+
+test-cov:
+	uv run pytest --cov=dijay --cov-report=xml:coverage.xml
 
 build:
 	uv build
