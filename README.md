@@ -224,19 +224,16 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-def inject[T](token: type[T]):
+def inject[T](token: type[T]) -> T:
     """FastAPI dependency that resolves a token from the container."""
     async def use(request: Request) -> T:
-        return await request.app.state.container.resolve(
-            token, id=str(id(request))
-        )
-    return Depends(use)
+        return await request.app.state.container.resolve(token, id=str(id(request)))
+
+    return Annotated[token, Depends(use)]
 
 
 @app.get("/")
-async def root(
-    service: Annotated[MyService, inject(MyService)]
-):
+async def root(service: inject(MyService)):
     return await service.do_something()
 ```
 
