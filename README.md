@@ -1,6 +1,6 @@
 [![ci](https://github.com/leandroluk/python-dijay/actions/workflows/ci.yml/badge.svg)](https://github.com/leandroluk/python-dijay/actions/workflows/ci.yml)
 [![coverage](https://codecov.io/gh/leandroluk/python-dijay/graph/badge.svg)](https://codecov.io/gh/leandroluk/python-dijay)
-[![release](https://img.shields.io/github/v/release/leandroluk/python-dijay?color=green)](https://github.com/leandroluk/python-dijay/releases)
+[![release](https://img.shields.io/github/v/tag/leandroluk/python-dijay?color=green)](https://github.com/leandroluk/python-dijay/releases)
 [![pypi](https://img.shields.io/pypi/v/dijay?color=green)](https://pypi.org/project/dijay)
 [![license](https://img.shields.io/github/license/leandroluk/python-dijay)](https://github.com/leandroluk/python-dijay/blob/main/LICENSE)
 
