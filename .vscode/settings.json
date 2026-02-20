@@ -47,8 +47,6 @@
         "**/*.egg-info": true,
         "dist": true,
         ".coverage": true,
-        "coverage.xml": true,
-        "junit.xml": true,
         ".cache": true,
         "site": true,
     }
