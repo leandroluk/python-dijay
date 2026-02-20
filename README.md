@@ -201,27 +201,12 @@ await container.shutdown()
 
 ## 🌐 FastAPI Integration
 
-Integrate **dijay** using FastAPI's `lifespan` to manage the container lifecycle:
+Create a helper to resolve dependencies from the container via FastAPI's `Depends`:
 
 ```python
-from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Request
-from dijay import Container, module
-
-@module(...)
-class AppModule: ...
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    container = Container.from_module(AppModule)
-    await container.bootstrap()
-    app.state.container = container
-    yield
-    await container.shutdown()
-
-app = FastAPI(lifespan=lifespan)
+from fastapi import Depends, Request
 
 
 def inject[T](token: type[T]) -> T:
@@ -230,8 +215,50 @@ def inject[T](token: type[T]) -> T:
         return await request.app.state.container.resolve(token, id=str(id(request)))
 
     return Annotated[token, Depends(use)]
+```
+
+Then, use the container as an async context manager and attach it to `app.state`:
+
+```python
+import asyncio
+
+import uvicorn
+from fastapi import FastAPI
+
+from dijay import Container, module
+
+@module(...)
+class AppModule: ...
+
+app = FastAPI(title="My API", version="0.0.1")
 
 
+async def main():
+    async with Container.from_module(AppModule) as container:
+        app.state.container = container
+
+        server = uvicorn.Server(uvicorn.Config(app, host="0.0.0.0", port=8000))
+        await server.serve()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+For **development with reload**, use event handlers since uvicorn factories require synchronous return:
+
+```python
+def dev():
+    container = Container.from_module(AppModule)
+    app.state.container = container
+    app.add_event_handler("startup", container.bootstrap)
+    app.add_event_handler("shutdown", container.shutdown)
+    return app
+```
+
+Use your routes with the `inject` helper:
+
+```python
 @app.get("/")
 async def root(service: inject(MyService)):
     return await service.do_something()
