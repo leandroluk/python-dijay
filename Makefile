@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := setup
 
-.PHONY: setup install test test-cov build publish clean lint format
+.PHONY: setup install test test-cov build publish clean lint format tag
 
 setup:
 	uv venv --python 3.14
@@ -35,3 +35,12 @@ clean:
 	[shutil.rmtree(p, ignore_errors=True) for p in ['dist', '.pytest_cache', '.venv']]; \
 	[shutil.rmtree(p, ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]; \
 	[p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
+
+tag:
+	@test -n "$(v)" || (echo "Usage: make tag v=X.Y.Z" && exit 1)
+	python -c "import re, pathlib; \
+	p = pathlib.Path('pyproject.toml'); \
+	p.write_text(re.sub(r'version = \".*?\"', 'version = \"$(v)\"', p.read_text(), count=1))"
+	git add pyproject.toml
+	git commit -m "chore: bump version to $(v)"
+	git tag v$(v)
