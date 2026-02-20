@@ -38,9 +38,10 @@ clean:
 
 tag:
 	@python -c "import sys; v='$(v)'; sys.exit('Usage: make tag v=X.Y.Z') if not v else None"
-	python -c "import re, pathlib; \
+	@python -c "import re, pathlib; \
 	p = pathlib.Path('pyproject.toml'); \
 	p.write_text(re.sub(r'version = \".*?\"', 'version = \"$(v)\"', p.read_text(), count=1))"
-	git add pyproject.toml
-	git commit -m "chore: bump version to $(v)"
-	git tag v$(v)
+	@git add pyproject.toml
+	@git commit -m "chore: bump version to $(v)"
+	@git tag v$(v)
+	@echo "Tagged v$(v)"
