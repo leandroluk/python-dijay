@@ -4,11 +4,10 @@ from dijay import DynamicModule, module
 
 from .fake import FakeDatabaseModule
 
+modules = [FakeDatabaseModule]
 
-@module(
-    imports=[FakeDatabaseModule],
-    exports=[FakeDatabaseModule],
-)
+
+@module(imports=modules, exports=modules)
 class DatabaseModule:
     @staticmethod
     def for_root(connection_string: str) -> DynamicModule:

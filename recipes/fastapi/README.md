@@ -59,9 +59,11 @@ src/
 ```python
 # src/infrastructure/database/module.py
 
+modules = [FakeDatabaseModule]
+
 @module(
-    imports=[FakeDatabaseModule],
-    exports=[FakeDatabaseModule],
+    imports=[modules],
+    exports=[modules],
 )
 class DatabaseModule:
     @staticmethod
