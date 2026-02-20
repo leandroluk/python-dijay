@@ -96,7 +96,6 @@ async def test_constructor_injection():
 
     @injectable()
     class App:
-
         def __init__(self, service: Service, data: str):
 
             self.service = service
@@ -120,7 +119,6 @@ async def test_annotated_token_injection():
 
     @c.injectable()
     class Client:
-
         def __init__(self, url: Annotated[str, Inject("API_URL")]):
 
             self.url = url
@@ -147,9 +145,62 @@ async def test_lifecycle_context_manager():
         events.append("shut")
 
     async with c:
-
         assert "boot" in events
 
         assert "shut" not in events
 
     assert "shut" in events
+
+
+@pytest.mark.asyncio
+async def test_register_binds_implementation():
+    c = instance()
+
+    class Repo:
+        pass
+
+    class FakeRepo(Repo):
+        pass
+
+    c.register(Repo, FakeRepo)
+    repo = await c.resolve(Repo)
+
+    assert isinstance(repo, FakeRepo)
+
+
+@pytest.mark.asyncio
+async def test_register_conditional():
+    c = instance()
+
+    class Storage:
+        pass
+
+    class MemoryStorage(Storage):
+        pass
+
+    class DiskStorage(Storage):
+        pass
+
+    provider_map = {"memory": MemoryStorage, "disk": DiskStorage}
+
+    selected = provider_map.get("memory")
+    c.register(Storage, selected)
+
+    storage = await c.resolve(Storage)
+
+    assert isinstance(storage, MemoryStorage)
+
+
+@pytest.mark.asyncio
+async def test_register_transient_scope():
+    c = instance()
+
+    class Svc:
+        pass
+
+    c.register(Svc, Svc, scope=TRANSIENT)
+
+    s1 = await c.resolve(Svc)
+    s2 = await c.resolve(Svc)
+
+    assert s1 is not s2

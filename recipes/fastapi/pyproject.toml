@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-recipe"
+version = "0.1.0"
+description = "FastAPI recipe example"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "watchfiles",
+    "dijay",
+]
+
+[project.scripts]
+fastapi-recipe = "src.main:run"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.uv.sources]
+dijay = { workspace = true }

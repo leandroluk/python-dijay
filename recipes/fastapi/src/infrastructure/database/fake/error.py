@@ -1,0 +1,2 @@
+class FakeDatabaseError(Exception):
+    pass

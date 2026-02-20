@@ -1,10 +1,10 @@
 [project]
 name = "dijay"
-version = "0.1.0"
-description = "Modern Async DI Container for Python 3.14+"
+version = "0.2.0"
+description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+. Less boilerplate, more harmony."
 readme = "README.md"
 requires-python = ">=3.14"
-authors = [{ name = "Leandro Luk", email = "seu-email@exemplo.com" }]
+authors = [{ name = "Leandro Santiago Gomes", email = "leandroluk@gmail.com" }]
 keywords = ["dependency-injection", "async", "nestjs", "solid", "type-hints"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -13,9 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries",
 ]
-dependencies = [
-    "ruff>=0.15.1",
-]
+dependencies = ["ruff>=0.15.1"]
 
 [project.urls]
 Homepage = "https://github.com/leandroluk/dijay"
@@ -39,9 +37,15 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "ASYNC", "S"]
-ignore = ["S101"]                                 # Permite assert em testes
+ignore = ["S101"]
 
 [tool.mypy]
 python_version = "3.14"
 strict = true
 files = ["dijay"]
+
+[tool.uv.workspace]
+members = ["recipes/*"]
+
+[tool.uv.sources]
+dijay = { workspace = true }

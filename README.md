@@ -1,102 +1,207 @@
 # 🎧 dijay
 
-**dijay** is a high-performance, asynchronous Dependency Injection (DI) library for Python 3.14+, heavily inspired by the NestJS ecosystem. Built for strict typing and speed, it leverages the latest Python features (PEP 649, 695) and is optimized for `uv`.
+**Drop the beat on your dependencies.**
+
+**dijay** is the "remix" your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+. Less boilerplate, more harmony.
 
 ## 🚀 Features
 
+* **Modular Architecture**: Organize code into `@module`s with `imports`, `providers`, and `exports`.
 * **Constructor Injection**: Clean, testable injection via `__init__` and `Annotated`.
-* **Flexible Scopes**: Support for `SINGLETON`, `TRANSIENT`, and `REQUEST`.
+* **Flexible Scopes**: `SINGLETON`, `TRANSIENT`, and `REQUEST`.
 * **Async Native**: First-class support for asynchronous factories and lifecycle hooks.
-* **Scope Bubbling**: Intelligent lifetime management to prevent stale references.
-* **Lifecycle Hooks**: Simple `@on_bootstrap` and `@on_shutdown` decorators.
-* **Zero Config**: Powerful autowiring based on Type Hints.
+* **Custom Providers**: `Provide` dataclass for value, class and factory bindings.
+* **Lifecycle Hooks**: `@on_bootstrap` and `@on_shutdown` decorators.
+* **Circular Dependency Detection**: Immediate `RuntimeError` on cycles.
 
 ## 📦 Installation
 
 ```bash
 uv add dijay
-
 ```
 
 ## ⚡ Quick Start
 
+### 1. Define Services
+
 ```python
-from typing import Annotated
-from dijay import inject, resolve, Inject
+from dijay import injectable
 
-class Base: pass
+@injectable()
+class CatsService:
+    def get_all(self):
+        return ["Meow", "Purr"]
+```
 
-@inject(Base)
-class Implementation(Base):
+### 2. Create a Module
+
+```python
+from dijay import module
+
+@module(
+    providers=[CatsService],
+    exports=[CatsService],
+)
+class CatsModule:
+    pass
+```
+
+### 3. Bootstrap the App
+
+```python
+import asyncio
+from dijay import Container, module
+
+@module(imports=[CatsModule])
+class AppModule:
     pass
 
-@inject()
-class Controller:
-    def __init__(self, service: Base):
-        self.service = service
-
 async def main():
-    app = await resolve(Controller)
+    async with Container.from_module(AppModule) as container:
+        service = await container.resolve(CatsService)
+        print(service.get_all())
 
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
-## 🫧 Scope Bubbling
+`Container.from_module(AppModule)` scans the module tree, registers all providers, and returns a fully configured `Container`.
 
-**dijay** implements automatic scope elevation (bubbling). If a provider with a wider lifetime (e.g., `SINGLETON`) depends on a provider with a narrower lifetime (e.g., `REQUEST`), the container automatically treats the dependent as having the narrower scope.
+## 🧩 Modules
 
-This prevents **Scope Leaks**, ensuring that a Singleton never captures and holds onto a stale Request-scoped instance.
-
-## 🌐 FastAPI Integration
-
-To integrate **dijay** with FastAPI, use a dependency to manage request-scoped resolution:
+Modules are the building blocks of a **dijay** application. They encapsulate providers and manage dependencies.
 
 ```python
-from fastapi import FastAPI, Request, Depends
-from dijay import resolve, instance
-
-app = FastAPI()
-container = instance()
-
-async def get_service[T](token: type[T]):
-    async def _resolve(request: Request) -> T:
-        return await container.resolve(token, id=str(id(request)))
-    return _resolve
-
-@app.get("/")
-async def root(service: Annotated[MyService, Depends(get_service(MyService))]):
-    return await service.do_something()
-
+@module(
+    imports=[DatabaseModule],
+    providers=[UserService],
+    exports=[UserService],
+)
+class UserModule: ...
 ```
+
+### Dynamic Modules
+
+For conditional configuration (e.g. swapping implementations by environment), use a static method that returns a `DynamicModule`:
+
+```python
+import os
+from dijay import DynamicModule, module
+
+from .fake import FakeDatabaseModule
+from .postgres import PostgresDatabaseModule
+
+@module(
+    imports=[FakeDatabaseModule],
+    exports=[FakeDatabaseModule],
+)
+class DatabaseModule:
+    @staticmethod
+    def for_root() -> DynamicModule:
+        db_module = {
+            "fake": FakeDatabaseModule,
+            "postgres": PostgresDatabaseModule,
+        }[os.getenv("DB_PROVIDER", "fake")]
+
+        return DynamicModule(
+            module=DatabaseModule,
+            imports=[db_module],
+            exports=[db_module],
+        )
+```
+
+## 💉 Custom Providers
+
+Use `Provide` to register values, classes or factories directly in a module:
+
+```python
+from dijay import module, Provide
+
+@module(providers=[
+    Provide("DB_URL", use_value="postgresql://localhost/mydb"),
+    Provide(Cache, use_class=RedisCache),
+    Provide(HttpClient, use_factory=create_http_client),
+])
+class InfraModule: ...
+```
+
+| Attribute     | Description                                 |
+| ------------- | ------------------------------------------- |
+| `use_value`   | Binds a constant value to the token.        |
+| `use_class`   | Binds a class to instantiate for the token. |
+| `use_factory` | Binds a callable to invoke for the token.   |
+| `scope`       | Lifetime scope (defaults to `SINGLETON`).   |
 
 ## 💉 Advanced Constructor Injection
 
-The library leverages `Annotated` to decouple type hints from injection tokens, similar to the NestJS `@Inject()` decorator.
+Use `Annotated` with `Inject` to decouple type hints from injection tokens:
 
 ```python
 from typing import Annotated
-from dijay import Inject, inject
+from dijay import Inject, injectable
 
-@inject()
+@injectable()
 class Persistence:
     def __init__(
-        self, 
-        conn_string: Annotated[str, Inject("DB_CONNECTION")]
+        self,
+        conn_string: Annotated[str, Inject("DB_URL")]
     ):
         self.conn = conn_string
-
 ```
 
-## 🛠️ Development
+## 🌐 FastAPI Integration
 
-1. **Sync Environment**: `uv sync`
-2. **Run Tests**: `uv run pytest`
-3. **Build Package**: `uv build`
+Integrate **dijay** using FastAPI's `lifespan` to manage the container lifecycle:
+
+```python
+from contextlib import asynccontextmanager
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, Request
+from dijay import Container, module
+
+@module(...)
+class AppModule: ...
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    container = Container.from_module(AppModule)
+    await container.bootstrap()
+    app.state.container = container
+    yield
+    await container.shutdown()
+
+app = FastAPI(lifespan=lifespan)
+
+
+def inject[T](token: type[T]):
+    """FastAPI dependency that resolves a token from the container."""
+    async def use(request: Request) -> T:
+        return await request.app.state.container.resolve(
+            token, id=str(id(request))
+        )
+    return Depends(use)
+
+
+@app.get("/")
+async def root(
+    service: Annotated[MyService, inject(MyService)]
+):
+    return await service.do_something()
+```
 
 ## 🔄 Circular Dependency Detection
 
-**dijay** actively monitors the resolution stack. If a cycle is detected (e.g., A -> B -> A), a `RuntimeError` is raised immediately to prevent stack overflow.
+**dijay** monitors the resolution stack. If a cycle is detected (e.g., `A → B → A`), a `RuntimeError` is raised immediately.
+
+## 🛠️ Development
+
+```bash
+uv sync
+uv run pytest
+uv build
+```
 
 ## 📄 License
 
 MIT
-
