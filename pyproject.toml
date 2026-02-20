@@ -1,6 +1,6 @@
 [project]
 name = "dijay"
-version = "0.3.29"
+version = "0.3.30"
 description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+. Less boilerplate, more harmony."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -59,3 +59,6 @@ members = ["recipes/*"]
 
 [tool.uv.sources]
 dijay = { workspace = true }
+
+[tool.coverage.run]
+relative_files = true
