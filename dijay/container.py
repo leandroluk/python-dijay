@@ -41,8 +41,11 @@ class Container:
         self._registry: dict[Any, dict[str, Any]] = {}
         self._singletons: dict[Any, Any] = {}
         self._request_store: dict[str, dict[Any, Any]] = {}
+        self._request_store: dict[str, dict[Any, Any]] = {}
         self._bootstrap_hooks: list[Callable[..., Any]] = []
         self._shutdown_hooks: list[Callable[..., Any]] = []
+        self._bootstrap_methods: dict[Any, list[str]] = {}
+        self._shutdown_methods: dict[Any, list[str]] = {}
         self._resolving: set[Any] = set()
 
     def injectable(
@@ -78,6 +81,16 @@ class Container:
                 "scope": scope,
                 "is_class": inspect.isclass(provider),
             }
+
+            if inspect.isclass(provider):
+                for name, value in inspect.getmembers(provider):
+                    if getattr(value, "__dijay_bootstrap__", False):
+                        self._bootstrap_methods.setdefault(target_token, []).append(
+                            name
+                        )
+                    if getattr(value, "__dijay_shutdown__", False):
+                        self._shutdown_methods.setdefault(target_token, []).append(name)
+
             provider.__dijay_token__ = target_token
             provider.__dijay_scope__ = scope
             return provider
@@ -110,6 +123,13 @@ class Container:
             "is_class": inspect.isclass(provider),
         }
 
+        if inspect.isclass(provider):
+            for name, value in inspect.getmembers(provider):
+                if getattr(value, "__dijay_bootstrap__", False):
+                    self._bootstrap_methods.setdefault(token, []).append(name)
+                if getattr(value, "__dijay_shutdown__", False):
+                    self._shutdown_methods.setdefault(token, []).append(name)
+
     def on_bootstrap(self, fn: Callable[..., Any]) -> Callable[..., Any]:
         """Register a hook to run during :meth:`bootstrap`.
 
@@ -121,6 +141,7 @@ class Container:
             The original callable, unchanged.
         """
         self._bootstrap_hooks.append(fn)
+        fn.__dijay_bootstrap__ = True
         return fn
 
     def on_shutdown(self, fn: Callable[..., Any]) -> Callable[..., Any]:
@@ -134,17 +155,45 @@ class Container:
             The original callable, unchanged.
         """
         self._shutdown_hooks.append(fn)
+        fn.__dijay_shutdown__ = True
         return fn
 
     async def bootstrap(self) -> None:
         """Execute all registered bootstrap hooks in order."""
         for hook in self._bootstrap_hooks:
+            # Skip if it's a method that will be called via _bootstrap_methods.
+            # We detect methods by checking if they belong to a class.
+            if (
+                inspect.isroutine(hook)
+                and "." in hook.__qualname__
+                and "<locals>" not in hook.__qualname__
+            ):
+                continue
             await self.call(hook)
+
+        for token, methods in self._bootstrap_methods.items():
+            instance_obj = await self.resolve(token)
+            for method_name in methods:
+                await self.call(getattr(instance_obj, method_name))
 
     async def shutdown(self) -> None:
         """Execute all shutdown hooks and clear internal caches."""
         for hook in self._shutdown_hooks:
+            if (
+                inspect.isroutine(hook)
+                and "." in hook.__qualname__
+                and "<locals>" not in hook.__qualname__
+            ):
+                continue
             await self.call(hook)
+
+        for token, methods in self._shutdown_methods.items():
+            # Only shutdown singletons that were actually created
+            if token in self._singletons:
+                instance_obj = self._singletons[token]
+                for method_name in methods:
+                    await self.call(getattr(instance_obj, method_name))
+
         self._singletons.clear()
         self._request_store.clear()
 

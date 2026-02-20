@@ -155,6 +155,50 @@ class Persistence:
         self.conn = conn_string
 ```
 
+## 🔄 Lifecycle Hooks
+
+**dijay** supports `@on_bootstrap` and `@on_shutdown` decorators to execute logic when the container starts or stops. The most common way to use them is as decorators for methods within `@injectable` classes:
+
+```python
+from dijay import on_bootstrap, on_shutdown, injectable
+
+@injectable()
+class Database:
+    @on_bootstrap
+    async def connect(self):
+        print("Database connected!")
+
+    @on_shutdown
+    async def disconnect(self):
+        print("Database disconnected!")
+```
+
+Hooks can also be defined as standalone functions:
+
+```python
+@on_bootstrap
+async def log_startup(db: Database):
+    print("App is starting...")
+```
+
+Hooks can be synchronous or asynchronous and support full dependency injection. They are automatically triggered when using the container as an async context manager:
+
+```python
+async with Container.from_module(AppModule):
+    # @on_bootstrap hooks have already run here
+    ...
+# @on_shutdown hooks run when exiting the block
+```
+
+Alternatively, you can call them manually:
+
+```python
+container = Container.from_module(AppModule)
+await container.bootstrap()
+...
+await container.shutdown()
+```
+
 ## 🌐 FastAPI Integration
 
 Integrate **dijay** using FastAPI's `lifespan` to manage the container lifecycle:
