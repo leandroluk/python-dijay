@@ -2,14 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "recipe:fastapi",
+            "name": "recipe:fastapi-ddd",
             "type": "debugpy",
             "request": "launch",
             "module": "src.main",
-            "cwd": "${workspaceFolder}/recipes/fastapi",
+            "cwd": "${workspaceFolder}/recipes/fastapi-ddd",
             "console": "integratedTerminal",
             "env": {
-                "PYTHONPATH": "${workspaceFolder}/recipes/fastapi;${workspaceFolder}"
+                "PYTHONPATH": "${workspaceFolder}/recipes/fastapi-ddd;${workspaceFolder}"
             }
         }
     ]

@@ -5,7 +5,7 @@ requires-python = ">=3.14"
 [manifest]
 members = [
     "dijay",
-    "fastapi-recipe",
+    "fastapi-recipe-ddd",
 ]
 
 [[package]]
@@ -100,7 +100,7 @@ wheels = [
 
 [[package]]
 name = "dijay"
-version = "0.2.0"
+version = "0.3.7"
 source = { editable = "." }
 dependencies = [
     { name = "ruff" },
@@ -144,9 +144,9 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-recipe"
+name = "fastapi-recipe-ddd"
 version = "0.1.0"
-source = { editable = "recipes/fastapi" }
+source = { editable = "recipes/fastapi-ddd" }
 dependencies = [
     { name = "dijay" },
     { name = "fastapi" },

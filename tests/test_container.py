@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 import pytest
 
@@ -204,3 +204,84 @@ async def test_register_transient_scope():
     s2 = await c.resolve(Svc)
 
     assert s1 is not s2
+
+
+@pytest.mark.asyncio
+async def test_circular_dependency_raises():
+    c = instance()
+
+    @c.injectable()
+    class A:
+        def __init__(self, b: B):
+            pass
+
+    @c.injectable()
+    class B:
+        def __init__(self, a: A):
+            pass
+
+    with pytest.raises(RuntimeError, match="Circular dependency"):
+        await c.resolve(A)
+
+
+@pytest.mark.asyncio
+async def test_unregistered_class_auto_resolved():
+    c = instance()
+
+    class Standalone:
+        pass
+
+    obj = await c.resolve(Standalone)
+    assert isinstance(obj, Standalone)
+
+
+@pytest.mark.asyncio
+async def test_unregistered_non_class_raises():
+    c = instance()
+
+    with pytest.raises(RuntimeError, match="não registrado"):
+        await c.resolve("unknown_token")
+
+
+@pytest.mark.asyncio
+async def test_any_hint_skipped():
+    c = instance()
+
+    @c.injectable()
+    class WithAny:
+        def __init__(self, x: Any = "default"):
+            self.x = x
+
+    obj = await c.resolve(WithAny)
+    assert obj.x == "default"
+
+
+@pytest.mark.asyncio
+async def test_optional_dependency_fallback():
+    c = instance()
+
+    class Missing:
+        pass
+
+    @c.injectable()
+    class WithOptional:
+        def __init__(self, dep: Missing | None = None):
+            self.dep = dep
+
+    obj = await c.resolve(WithOptional)
+    assert obj.dep is None
+
+
+@pytest.mark.asyncio
+async def test_annotated_without_inject():
+    c = instance()
+
+    c.register("my_value", lambda: 42)
+
+    @c.injectable()
+    class WithAnnotated:
+        def __init__(self, val: Annotated[int, "just_metadata"]):
+            self.val = val
+
+    obj = await c.resolve(WithAnnotated)
+    assert isinstance(obj.val, int)

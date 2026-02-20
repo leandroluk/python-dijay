@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fastapi-recipe"
+name = "fastapi-recipe-ddd"
 version = "0.1.0"
 description = "FastAPI recipe example"
 readme = "README.md"
@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-fastapi-recipe = "src.main:run"
+fastapi-recipe-ddd = "src.main:run"
 
 [tool.setuptools]
 packages = ["src"]

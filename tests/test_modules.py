@@ -1,6 +1,6 @@
 import pytest
 
-from dijay import Container, injectable, module
+from dijay import Container, Provide, injectable, module
 
 
 @injectable()
@@ -92,3 +92,72 @@ async def test_dynamic_module_factory():
     c2 = Container.from_module(dynamic_mod_struct)
     svc = await c2.resolve(DynamicService)
     assert isinstance(svc, DynamicService)
+
+
+@pytest.mark.asyncio
+async def test_provide_use_value():
+    @module(providers=[Provide("DB_URL", use_value="postgres://localhost")])
+    class Mod:
+        pass
+
+    c = Container.from_module(Mod)
+    val = await c.resolve("DB_URL")
+    assert val == "postgres://localhost"
+
+
+@pytest.mark.asyncio
+async def test_provide_use_factory():
+    @module(providers=[Provide("greeting", use_factory=lambda: "hello")])
+    class Mod:
+        pass
+
+    c = Container.from_module(Mod)
+    val = await c.resolve("greeting")
+    assert val == "hello"
+
+
+@pytest.mark.asyncio
+async def test_provide_use_class():
+    class MyImpl:
+        pass
+
+    @module(providers=[Provide(MyImpl, use_class=MyImpl)])
+    class Mod:
+        pass
+
+    c = Container.from_module(Mod)
+    obj = await c.resolve(MyImpl)
+    assert isinstance(obj, MyImpl)
+
+
+@pytest.mark.asyncio
+async def test_dynamic_module_with_imports():
+    @injectable()
+    class InnerService:
+        pass
+
+    @module(providers=[InnerService])
+    class InnerModule:
+        pass
+
+    @module()
+    class OuterModule:
+        pass
+
+    dynamic = {
+        "module": OuterModule,
+        "imports": [InnerModule],
+    }
+
+    c = Container.from_module(dynamic)
+    svc = await c.resolve(InnerService)
+    assert isinstance(svc, InnerService)
+
+
+@pytest.mark.asyncio
+async def test_module_without_metadata():
+    class PlainClass:
+        pass
+
+    c = Container.from_module(PlainClass)
+    assert c is not None
