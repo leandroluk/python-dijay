@@ -22,7 +22,7 @@ test:
 	uv run pytest
 
 test-cov:
-	uv run pytest --cov=dijay --cov-report=xml:coverage.xml
+	uv run pytest --cov=dijay --cov-report=xml:coverage.xml --junitxml=junit.xml -o junit_family=legacy
 
 build:
 	uv build

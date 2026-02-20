@@ -44,7 +44,11 @@
         "**/.mypy_cache": true,
         "**/.pytest_cache": true,
         "**/.ruff_cache": true,
-        "**/*.egg-info": true
+        "**/*.egg-info": true,
+        "dist": true,
+        ".coverage": true,
+        "coverage.xml": true,
+        "junit.xml": true
     }
     // #endregion
 }
