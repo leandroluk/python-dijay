@@ -71,7 +71,7 @@ class Container:
         self._shutdown_hooks: list[Callable[..., Any]] = []
         self._resolving: set[Any] = set()
 
-    def inject(
+    def injectable(
         self,
         token: Any | None = None,
         scope: str = SINGLETON,
@@ -294,8 +294,8 @@ class Container:
 
 _global = Container()
 
-inject = _global.inject
-"""Shortcut for :meth:`Container.inject` on the global container."""
+injectable = _global.injectable
+"""Shortcut for :meth:`Container.injectable` on the global container."""
 
 resolve = _global.resolve
 """Shortcut for :meth:`Container.resolve` on the global container."""
