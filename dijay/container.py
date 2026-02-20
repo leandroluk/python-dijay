@@ -41,7 +41,6 @@ class Container:
         self._registry: dict[Any, dict[str, Any]] = {}
         self._singletons: dict[Any, Any] = {}
         self._request_store: dict[str, dict[Any, Any]] = {}
-        self._request_store: dict[str, dict[Any, Any]] = {}
         self._bootstrap_hooks: list[Callable[..., Any]] = []
         self._shutdown_hooks: list[Callable[..., Any]] = []
         self._bootstrap_methods: dict[Any, list[str]] = {}
@@ -141,7 +140,7 @@ class Container:
             The original callable, unchanged.
         """
         self._bootstrap_hooks.append(fn)
-        fn.__dijay_bootstrap__ = True
+        setattr(fn, "__dijay_bootstrap__", True)
         return fn
 
     def on_shutdown(self, fn: Callable[..., Any]) -> Callable[..., Any]:
@@ -155,7 +154,7 @@ class Container:
             The original callable, unchanged.
         """
         self._shutdown_hooks.append(fn)
-        fn.__dijay_shutdown__ = True
+        setattr(fn, "__dijay_shutdown__", True)
         return fn
 
     async def bootstrap(self) -> None:
