@@ -13,7 +13,11 @@ from .presentation.http.server import HttpServer
 async def main():
     async with Container.from_module(AppModule) as container:
         server = await container.resolve(HttpServer)
-        config = uvicorn.Config(server.app, host=server.config.host, port=server.config.port)
+        config = uvicorn.Config(
+            server.app,
+            host=server.config.host,
+            port=server.config.port,
+        )
         await uvicorn.Server(config).serve()
 
 
