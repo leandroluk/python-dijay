@@ -37,7 +37,7 @@ clean:
 	[p.unlink() for p in pathlib.Path('.').rglob('*.py[co]')]"
 
 tag:
-	@test -n "$(v)" || (echo "Usage: make tag v=X.Y.Z" && exit 1)
+	@python -c "import sys; v='$(v)'; sys.exit('Usage: make tag v=X.Y.Z') if not v else None"
 	python -c "import re, pathlib; \
 	p = pathlib.Path('pyproject.toml'); \
 	p.write_text(re.sub(r'version = \".*?\"', 'version = \"$(v)\"', p.read_text(), count=1))"
