@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := setup
 
-.PHONY: setup install test test-cov build publish clean lint format tag
+.PHONY: setup install test test-cov build publish clean lint format tag docs docs-build
 
 setup:
 	uv venv --python 3.14
@@ -46,3 +46,9 @@ tag:
 	@git tag v$(v)
 	@git push origin main v$(v)
 	@echo "Tagged v$(v)"
+
+docs:
+	uv run zensical serve
+
+docs-build:
+	uv run zensical build

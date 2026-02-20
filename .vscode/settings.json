@@ -48,7 +48,9 @@
         "dist": true,
         ".coverage": true,
         "coverage.xml": true,
-        "junit.xml": true
+        "junit.xml": true,
+        ".cache": true,
+        "site": true,
     }
     // #endregion
 }

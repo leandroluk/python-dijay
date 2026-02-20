@@ -22,6 +22,7 @@ def module(
     providers: list[Any] = [],
     imports: list[Any] = [],
     exports: list[Any] = [],
+    globals: bool = False,
 ) -> Callable[[Any], Any]:
     """Decorator that marks a class as a Module.
 
@@ -31,6 +32,7 @@ def module(
         providers: Providers to register within this module.
         imports: Imported modules that export providers.
         exports: Providers to export to importing modules.
+        globals: If ``True``, exports are available globally.
     """
 
     def decorator(cls: Any) -> Any:
@@ -38,6 +40,7 @@ def module(
             "providers": providers,
             "imports": imports,
             "exports": exports,
+            "globals": globals,
         }
         return cls
 

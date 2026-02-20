@@ -1,0 +1,52 @@
+[project]
+site_name = "dijay"
+site_description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+."
+site_url = "https://leandroluk.github.io/python-dijay/"
+repo_url = "https://github.com/leandroluk/python-dijay"
+repo_name = "leandroluk/python-dijay"
+
+[theme]
+name = "material"
+palette = [
+    { scheme = "slate", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-4", name = "Switch to light mode" } },
+    { scheme = "default", primary = "deep purple", accent = "amber", toggle = { icon = "material/brightness-7", name = "Switch to dark mode" } },
+]
+features = [
+    "navigation.tabs",
+    "navigation.sections",
+    "navigation.top",
+    "content.code.copy",
+    "content.code.annotate",
+    "search.highlight",
+]
+
+[theme.icon]
+repo = "fontawesome/brands/github"
+
+[plugins.mkdocstrings.handlers.python]
+paths = ["."]
+options = { show_source = true, show_root_heading = true, heading_level = 3 }
+
+[[nav]]
+Home = "index.md"
+
+[[nav]]
+"Getting Started" = "getting-started.md"
+
+[[nav."Guides"]]
+Modules = "guides/modules.md"
+
+[[nav."Guides"]]
+Providers = "guides/providers.md"
+
+[[nav."Guides"]]
+Injection = "guides/injection.md"
+
+[[nav."Guides"]]
+"Lifecycle Hooks" = "guides/lifecycle.md"
+
+[[nav."Guides"]]
+"FastAPI Integration" = "guides/fastapi.md"
+
+[[nav]]
+"API Reference" = "api.md"
