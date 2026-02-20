@@ -44,5 +44,5 @@ tag:
 	@git add pyproject.toml
 	@git commit -m "chore: bump version to $(v)"
 	@git tag v$(v)
-	@git push --follow-tags
+	@git push origin main v$(v)
 	@echo "Tagged v$(v)"
