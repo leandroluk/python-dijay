@@ -35,20 +35,20 @@ Home = "index.md"
 [[nav]]
 "Getting Started" = "getting-started.md"
 
-[[nav."Guides"]]
-Modules = "guides/modules.md"
+[[nav."Recipes"]]
+Modules = "recipes/modules.md"
 
-[[nav."Guides"]]
-Providers = "guides/providers.md"
+[[nav."Recipes"]]
+Providers = "recipes/providers.md"
 
-[[nav."Guides"]]
-Injection = "guides/injection.md"
+[[nav."Recipes"]]
+Injection = "recipes/injection.md"
 
-[[nav."Guides"]]
-"Lifecycle Hooks" = "guides/lifecycle.md"
+[[nav."Recipes"]]
+"Lifecycle Hooks" = "recipes/lifecycle.md"
 
-[[nav."Guides"]]
-"FastAPI Integration" = "guides/fastapi.md"
+[[nav."Recipes"]]
+"FastAPI Integration" = "recipes/fastapi.md"
 
 [[nav]]
 "API Reference" = "api.md"
