@@ -9,7 +9,7 @@ on:
 
 jobs:
   quality-and-tests:
-    name: quality-and-tests
+    name: Quality and Tests
     runs-on: ubuntu-latest
     
     steps:
