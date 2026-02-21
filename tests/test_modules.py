@@ -161,3 +161,25 @@ async def test_module_without_metadata():
 
     c = Container.from_module(PlainClass)
     assert c is not None
+
+
+@pytest.mark.asyncio
+async def test_provide_without_any_use():
+    @module(providers=[Provide("EMPTY")])
+    class Mod:
+        pass
+
+    c = Container.from_module(Mod)
+    with pytest.raises(RuntimeError):
+        await c.resolve("EMPTY")
+
+
+@pytest.mark.asyncio
+async def test_non_class_provider_is_ignored():
+    @module(providers=["not_a_class"])
+    class Mod:
+        pass
+
+    c = Container.from_module(Mod)
+    with pytest.raises(RuntimeError):
+        await c.resolve("not_a_class")
