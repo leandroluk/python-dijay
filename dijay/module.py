@@ -1,5 +1,4 @@
 import inspect
-from collections.abc import Callable
 from typing import Any, TypedDict
 
 from .container import Container
@@ -18,12 +17,7 @@ class DynamicModule(TypedDict, total=False):
     globals: bool
 
 
-def module(
-    providers: list[Any] = [],
-    imports: list[Any] = [],
-    exports: list[Any] = [],
-    globals: bool = False,
-) -> Callable[[Any], Any]:
+class module:  # noqa: N801
     """Decorator that marks a class as a Module.
 
     Modules organize providers and can be imported by other modules.
@@ -35,16 +29,85 @@ def module(
         globals: If ``True``, exports are available globally.
     """
 
-    def decorator(cls: Any) -> Any:
-        cls.__module_metadata__ = {
-            "providers": providers,
-            "imports": imports,
-            "exports": exports,
+    def __init__(
+        self,
+        providers: list[Any] | None = None,
+        imports: list[Any] | None = None,
+        exports: list[Any] | None = None,
+        globals: bool = False,
+    ):
+        self.metadata = {
+            "providers": providers or [],
+            "imports": imports or [],
+            "exports": exports or [],
             "globals": globals,
         }
+
+    def __call__(self, cls: Any) -> Any:
+        cls.__module_metadata__ = self.metadata
         return cls
 
-    return decorator
+    @staticmethod
+    def on_bootstrap(fn=None, /, container=None):
+        """Decorator to register a bootstrap hook.
+
+        Can be used with or without a container::
+
+            @module.on_bootstrap
+            def boot(): ...
+
+            @module.on_bootstrap(container=c)
+            def boot(): ...
+        """
+        from .container import Container
+        from .decorators import on_bootstrap as _global_on_bootstrap
+
+        def _make_decorator(_container):
+            def decorator(f):
+                if _container is not None:
+                    return _container.on_bootstrap(f)
+                return _global_on_bootstrap(f)
+
+            return decorator
+
+        if isinstance(fn, Container):
+            return _make_decorator(fn)
+        if container is not None:
+            return _make_decorator(container)
+        if callable(fn):
+            return _make_decorator(None)(fn)
+        return _make_decorator(None)
+
+    @staticmethod
+    def on_shutdown(fn=None, /, container=None):
+        """Decorator to register a shutdown hook.
+
+        Can be used with or without a container::
+
+            @module.on_shutdown
+            def shut(): ...
+
+            @module.on_shutdown(container=c)
+            def shut(): ...
+        """
+        from .container import Container
+        from .decorators import on_shutdown as _global_on_shutdown
+
+        def _make_decorator(_container):
+            def decorator(f):
+                if _container is not None:
+                    return _container.on_shutdown(f)
+                return _global_on_shutdown(f)
+
+            return decorator
+
+        if isinstance(fn, Container):
+            return _make_decorator(fn)
+        if container is not None:
+            return _make_decorator(container)
+        if callable(fn):
+            return _make_decorator(None)(fn)
+        return _make_decorator(None)
 
 
 def _is_dynamic_module(obj: Any) -> bool:

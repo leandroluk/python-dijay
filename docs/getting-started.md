@@ -85,7 +85,7 @@ Hello, World!
 1. `@injectable()` marks `GreetingService` as a provider.
 2. `@module(...)` groups providers and exports them.
 3. `Container.from_module(AppModule)` scans the module tree and registers all providers.
-4. `async with container` runs `@on_bootstrap` hooks on entry and `@on_shutdown` hooks on exit.
+4. `async with container` runs `@module.on_bootstrap` hooks on entry and `@module.on_shutdown` hooks on exit.
 5. `container.resolve(GreetingService)` returns a fully constructed instance with all dependencies injected.
 
 ## Next Steps

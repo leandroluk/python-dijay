@@ -3,7 +3,8 @@ from typing import Annotated, Any
 
 import pytest
 
-from dijay import Container, Inject, injectable, instance, on_bootstrap, on_shutdown
+from dijay import Container, Inject, injectable, instance
+from dijay import module as m
 
 
 @pytest.mark.asyncio
@@ -13,13 +14,13 @@ async def test_method_lifecycle_hooks():
 
     @c.injectable()
     class Service:
-        @on_bootstrap
+        @m.on_bootstrap
         async def boot(self):
             events.append("boot_started")
             await asyncio.sleep(0.01)
             events.append("boot_done")
 
-        @on_shutdown
+        @m.on_shutdown
         def shut(self):
             events.append("shut")
 
@@ -41,7 +42,7 @@ async def test_method_hooks_with_injection():
 
     @c.injectable()
     class Service:
-        @on_bootstrap
+        @m.on_bootstrap
         async def boot(self, dep: Dep):
             assert isinstance(dep, Dep)
             events.append("boot")
@@ -73,11 +74,11 @@ async def test_register_with_lifecycle_hooks():
     events = []
 
     class ManualService:
-        @on_bootstrap
+        @m.on_bootstrap
         def init(self):
             events.append("init")
 
-        @on_shutdown
+        @m.on_shutdown
         async def close(self):
             events.append("close")
 
@@ -96,11 +97,10 @@ async def test_shutdown_skips_uncreated_singletons():
 
     @c.injectable()
     class UnusedService:
-        @on_shutdown
+        @m.on_shutdown
         def shut(self):
             events.append("shut")
 
-    # We start and stop without ever resolving UnusedService
     async with c:
         pass
 
@@ -114,11 +114,11 @@ async def test_multiple_lifecycle_methods():
 
     @c.injectable()
     class MultiService:
-        @on_bootstrap
+        @m.on_bootstrap
         def boot1(self):
             events.append("boot1")
 
-        @on_bootstrap
+        @m.on_bootstrap
         def boot2(self):
             events.append("boot2")
 
@@ -135,14 +135,11 @@ class GlobalService:
 @pytest.mark.asyncio
 async def test_hook_skip_logic():
     c = instance()
-
-    # Manually add a "method" to hooks to trigger the 'continue'
-    # Use a class defined at module level to avoid '<locals>'
     c._bootstrap_hooks.append(GlobalService.method)
     c._shutdown_hooks.append(GlobalService.method)
 
     async with c:
-        pass  # Should skip GlobalService.method and not crash
+        pass
 
 
 @pytest.mark.asyncio
@@ -196,7 +193,6 @@ async def test_annotated_without_inject_in_lifecycle():
             self.x = x
 
     s = await c.resolve(Service)
-    # It tries to resolve int, which is a class, returns 0
     assert s.x == 0
 
 
@@ -244,7 +240,7 @@ async def test_lifecycle_with_modules():
 
     @injectable()
     class Service:
-        @on_bootstrap
+        @module.on_bootstrap
         def boot(self):
             events.append("boot")
 

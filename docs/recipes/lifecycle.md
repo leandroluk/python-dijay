@@ -1,21 +1,21 @@
 # Lifecycle Hooks
 
-**dijay** supports `@on_bootstrap` and `@on_shutdown` decorators to execute logic when the container starts or stops.
+**dijay** supports `@module.on_bootstrap` and `@module.on_shutdown` decorators to execute logic when the container starts or stops.
 
 ## Method Hooks
 
 The most common pattern is decorating methods within `@injectable` classes:
 
 ```python
-from dijay import on_bootstrap, on_shutdown, injectable
+from dijay import module, injectable
 
 @injectable()
 class Database:
-    @on_bootstrap
+    @module.on_bootstrap
     async def connect(self):
         print("Database connected!")
 
-    @on_shutdown
+    @module.on_shutdown
     async def disconnect(self):
         print("Database disconnected!")
 ```
@@ -24,12 +24,22 @@ When the container bootstraps, it resolves the `Database` singleton and calls `c
 
 ## Standalone Hooks
 
-Hooks can also be standalone functions. Parameters are injected automatically:
+Hooks can also be standalone functions registered on a specific container. Parameters are injected automatically:
 
 ```python
-from dijay import on_bootstrap
+from dijay import module, instance
 
-@on_bootstrap
+c = instance()
+
+@module.on_bootstrap(c)
+async def log_startup(db: Database):
+    print(f"App started with {db}")
+```
+
+If no container is provided, the hook is registered on the **global container**:
+
+```python
+@module.on_bootstrap
 async def log_startup(db: Database):
     print(f"App started with {db}")
 ```
@@ -39,11 +49,11 @@ async def log_startup(db: Database):
 Hooks can be synchronous or asynchronous — the container handles both:
 
 ```python
-@on_bootstrap
+@module.on_bootstrap
 def sync_hook():
     print("Sync hook!")
 
-@on_bootstrap
+@module.on_bootstrap
 async def async_hook():
     print("Async hook!")
 ```
@@ -56,9 +66,9 @@ Hooks are triggered automatically when using the container as an async context m
 
 ```python
 async with Container.from_module(AppModule) as container:
-    # @on_bootstrap hooks have already run here
+    # @module.on_bootstrap hooks have already run here
     ...
-# @on_shutdown hooks run when exiting the block
+# @module.on_shutdown hooks run when exiting the block
 ```
 
 ### Manual Control

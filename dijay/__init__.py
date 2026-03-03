@@ -18,8 +18,6 @@ from .container import Container
 from .decorators import (
     injectable,
     instance,
-    on_bootstrap,
-    on_shutdown,
     register,
     resolve,
 )
@@ -38,8 +36,6 @@ __all__ = [
     "injectable",
     "instance",
     "module",
-    "on_bootstrap",
-    "on_shutdown",
     "register",
     "resolve",
 ]

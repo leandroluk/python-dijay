@@ -99,17 +99,15 @@ async with Container.from_module(AppModule) as container:
 These are shortcuts that operate on a global `Container` instance. Ideal for simple apps:
 
 ```python
-from dijay import injectable, register, resolve, on_bootstrap, on_shutdown, instance
+from dijay import injectable, register, resolve, instance
 ```
 
-| Function       | Description                                               |
-| -------------- | --------------------------------------------------------- |
-| `injectable`   | Decorator to register a provider on the global container. |
-| `register`     | Bind a provider to a token on the global container.       |
-| `resolve`      | Resolve a dependency from the global container.           |
-| `on_bootstrap` | Register a bootstrap hook on the global container.        |
-| `on_shutdown`  | Register a shutdown hook on the global container.         |
-| `instance()`   | Create a new, independent `Container`.                    |
+| Function     | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| `injectable` | Decorator to register a provider on the global container. |
+| `register`   | Bind a provider to a token on the global container.       |
+| `resolve`    | Resolve a dependency from the global container.           |
+| `instance()` | Create a new, independent `Container`.                    |
 
 ---
 
@@ -156,11 +154,15 @@ def __init__(self, url: Annotated[str, Inject("DB_URL")]): ...
 
 ## module
 
-Decorator that marks a class as a Module.
+Decorator that marks a class as a Module, and namespace for lifecycle decorators.
 
 ```python
 from dijay import module
 ```
+
+### As a decorator
+
+Marks a class as a Module, grouping providers and configuring imports/exports.
 
 | Parameter   | Type        | Default | Description                                |
 | ----------- | ----------- | ------- | ------------------------------------------ |
@@ -168,6 +170,37 @@ from dijay import module
 | `imports`   | `list[Any]` | `[]`    | Imported modules that export providers.    |
 | `exports`   | `list[Any]` | `[]`    | Providers to export to importing modules.  |
 | `globals`   | `bool`      | `False` | If `True`, exports are available globally. |
+
+```python
+@module(providers=[Database], imports=[ConfigModule])
+class AppModule: ...
+```
+
+### `module.on_bootstrap(fn=None, /, container=None)`
+
+Decorator to register a bootstrap hook. If `container` is omitted, registers on the global container.
+
+```python
+# On a method (uses the container that resolves the class)
+@module.on_bootstrap
+async def connect(self): ...
+
+# On a standalone function with specific container
+@module.on_bootstrap(container=c)
+async def startup(db: Database): ...
+```
+
+### `module.on_shutdown(fn=None, /, container=None)`
+
+Decorator to register a shutdown hook. If `container` is omitted, registers on the global container.
+
+```python
+@module.on_shutdown
+async def disconnect(self): ...
+
+@module.on_shutdown(container=c)
+async def teardown(): ...
+```
 
 ---
 
