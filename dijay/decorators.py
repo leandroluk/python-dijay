@@ -1,5 +1,8 @@
 """Global container instance and module-level shortcuts."""
 
+from collections.abc import Callable
+from typing import Any
+
 from .container import Container
 
 _global = Container()
@@ -14,7 +17,11 @@ resolve = _global.resolve
 """Shortcut for :meth:`Container.resolve` on the global container."""
 
 
-def on_bootstrap(fn=None, /, container=None):
+def on_bootstrap(
+    fn: Callable[..., Any] | Container | None = None,
+    /,
+    container: Container | None = None,
+) -> Any:
     """Register a bootstrap hook on the given container (or global).
 
     Can be used as::
@@ -25,9 +32,9 @@ def on_bootstrap(fn=None, /, container=None):
         @on_bootstrap(container=c)
         def boot(): ...
     """
-    _container = fn if isinstance(fn, Container) else (container or _global)
+    _container: Container = fn if isinstance(fn, Container) else (container or _global)
 
-    def _decorator(f):
+    def _decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         return _container.on_bootstrap(f)
 
     if callable(fn) and not isinstance(fn, Container):
@@ -35,7 +42,11 @@ def on_bootstrap(fn=None, /, container=None):
     return _decorator
 
 
-def on_shutdown(fn=None, /, container=None):
+def on_shutdown(
+    fn: Callable[..., Any] | Container | None = None,
+    /,
+    container: Container | None = None,
+) -> Any:
     """Register a shutdown hook on the given container (or global).
 
     Can be used as::
@@ -46,9 +57,9 @@ def on_shutdown(fn=None, /, container=None):
         @on_shutdown(container=c)
         def shut(): ...
     """
-    _container = fn if isinstance(fn, Container) else (container or _global)
+    _container: Container = fn if isinstance(fn, Container) else (container or _global)
 
-    def _decorator(f):
+    def _decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         return _container.on_shutdown(f)
 
     if callable(fn) and not isinstance(fn, Container):

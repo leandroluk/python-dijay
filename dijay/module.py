@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, TypedDict
+from collections.abc import Callable
+from typing import Any, TypedDict, cast
 
 from .container import Container
 from .provider import SINGLETON, Provide
@@ -48,7 +49,11 @@ class module:  # noqa: N801
         return cls
 
     @staticmethod
-    def on_bootstrap(fn=None, /, container=None):
+    def on_bootstrap(
+        fn: Callable[..., Any] | Container | None = None,
+        /,
+        container: Container | None = None,
+    ) -> Any:
         """Decorator to register a bootstrap hook.
 
         Can be used with or without a container::
@@ -62,11 +67,13 @@ class module:  # noqa: N801
         from .container import Container
         from .decorators import on_bootstrap as _global_on_bootstrap
 
-        def _make_decorator(_container):
-            def decorator(f):
+        def _make_decorator(
+            _container: Container | None,
+        ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+            def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
                 if _container is not None:
                     return _container.on_bootstrap(f)
-                return _global_on_bootstrap(f)
+                return cast(Callable[..., Any], _global_on_bootstrap(f))
 
             return decorator
 
@@ -79,7 +86,11 @@ class module:  # noqa: N801
         return _make_decorator(None)
 
     @staticmethod
-    def on_shutdown(fn=None, /, container=None):
+    def on_shutdown(
+        fn: Callable[..., Any] | Container | None = None,
+        /,
+        container: Container | None = None,
+    ) -> Any:
         """Decorator to register a shutdown hook.
 
         Can be used with or without a container::
@@ -93,11 +104,13 @@ class module:  # noqa: N801
         from .container import Container
         from .decorators import on_shutdown as _global_on_shutdown
 
-        def _make_decorator(_container):
-            def decorator(f):
+        def _make_decorator(
+            _container: Container | None,
+        ) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+            def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
                 if _container is not None:
                     return _container.on_shutdown(f)
-                return _global_on_shutdown(f)
+                return cast(Callable[..., Any], _global_on_shutdown(f))
 
             return decorator
 
