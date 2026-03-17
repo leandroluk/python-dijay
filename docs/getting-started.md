@@ -17,7 +17,7 @@ Install **dijay** using your preferred package manager:
     ```
 
 !!! note "Python Version"
-    dijay requires **Python 3.14+** and leverages modern features like `type` parameter syntax and `Annotated` generics.
+    dijay requires **Python 3.13+** and leverages modern features like `type` parameter syntax and `Annotated` generics.
 
 ## Your First App
 

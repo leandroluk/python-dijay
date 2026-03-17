@@ -6,7 +6,7 @@ icon: lucide/rocket
 
 **Drop the beat on your dependencies.**
 
-**dijay** is the "remix" your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+. Less boilerplate, more harmony.
+**dijay** is the "remix" your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.13+. Less boilerplate, more harmony.
 
 [![ci](https://github.com/leandroluk/python-dijay/actions/workflows/ci.yml/badge.svg)](https://github.com/leandroluk/python-dijay/actions/workflows/ci.yml)
 [![coverage](https://codecov.io/gh/leandroluk/python-dijay/graph/badge.svg)](https://codecov.io/gh/leandroluk/python-dijay)

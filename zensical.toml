@@ -1,6 +1,6 @@
 [project]
 site_name = "dijay"
-site_description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+."
+site_description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.13+."
 site_url = "https://leandroluk.github.io/python-dijay/"
 repo_url = "https://github.com/leandroluk/python-dijay"
 repo_name = "leandroluk/python-dijay"

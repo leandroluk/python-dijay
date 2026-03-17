@@ -11,7 +11,7 @@ jobs:
   quality-and-tests:
     name: Quality and Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
 
@@ -21,8 +21,8 @@ jobs:
           enable-cache: true
           version: "latest"
 
-      - name: Set up Python 3.14
-        run: uv python install 3.14
+      - name: Set up Python 3.13
+        run: uv python install 3.13
 
       - name: Install dependencies
         run: make install
@@ -62,9 +62,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: astral-sh/setup-uv@v5
-      
+
       - name: Build and Publish
         run: |
           uv build
@@ -86,19 +86,19 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
-          
+
       - name: Build Docs
         run: make docs-build
-        
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './site'
-          
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

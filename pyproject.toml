@@ -1,16 +1,16 @@
 [project]
 name = "dijay"
 version = "0.4.0"
-description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.14+. Less boilerplate, more harmony."
+description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.13+. Less boilerplate, more harmony."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 authors = [{ name = "Leandro Santiago Gomes", email = "leandroluk@gmail.com" }]
 keywords = ["dependency-injection", "async", "nestjs", "solid", "type-hints"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "License :: OSI Approved :: MIT License",
-  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries",
 ]
 dependencies = ["ruff>=0.15.1"]
@@ -38,6 +38,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
+asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
@@ -49,9 +50,21 @@ select = ["E", "F", "I", "N", "UP", "ASYNC", "S"]
 ignore = ["S101"]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.13"
 strict = true
 files = ["dijay"]
+exclude = ["tests/", "venv/", ".venv/"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_any_unimported = false
+disallow_any_expr = false
+disallow_any_decorated = false
+disallow_any_explicit = false
+disallow_any_generics = false
+disallow_subclassing_any = false
+
+[tool.coverage.run]
+relative_files = true
 
 [tool.uv.workspace]
 members = ["recipes/*"]
@@ -59,5 +72,21 @@ members = ["recipes/*"]
 [tool.uv.sources]
 dijay = { workspace = true }
 
-[tool.coverage.run]
-relative_files = true
+[tool.pyright]
+include = ["src"]
+exclude = ["**/__pycache__", "**/tests", "**/.venv", "**/venv"]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+useLibraryCodeForTypes = true
+reportImplicitStringConcatenation = false
+reportUnknownMemberType = "information"
+reportUnknownArgumentType = "information"
+reportUnknownLambdaType = "information"
+reportMissingTypeStubs = false
+reportUnusedImport = "information"
+reportUnusedVariable = "information"
+reportUnknownVariableType = "information"
+reportGeneralTypeIssues = "warning"
+reportOptionalMemberAccess = "none"
+reportAttributeAccessIssue = "none"
+reportInvalidTypeVarUse = "none"

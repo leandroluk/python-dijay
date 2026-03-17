@@ -3,7 +3,7 @@
 .PHONY: setup install test test-cov build publish clean lint format tag docs docs-build
 
 setup:
-	uv venv --python 3.14
+	uv venv --python 3.13
 	uv sync
 
 install:
