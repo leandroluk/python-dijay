@@ -200,15 +200,20 @@ async def test_annotated_without_inject_in_lifecycle():
 async def test_circular_dependency_in_hook():
     c = instance()
 
+    class B:
+        pass
+
     @c.injectable()
     class A:
         def __init__(self, b: B):
             pass
 
     @c.injectable()
-    class B:
+    class BImpl(B):
         def __init__(self, a: A):
             pass
+
+    c.register(B, BImpl)
 
     @c.on_bootstrap
     async def boot(a: A):

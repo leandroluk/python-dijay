@@ -210,15 +210,20 @@ async def test_register_transient_scope():
 async def test_circular_dependency_raises():
     c = instance()
 
+    class B:
+        pass
+
     @c.injectable()
     class A:
         def __init__(self, b: B):
             pass
 
     @c.injectable()
-    class B:
+    class BImpl(B):
         def __init__(self, a: A):
             pass
+
+    c.register(B, BImpl)
 
     with pytest.raises(RuntimeError, match="Circular dependency"):
         await c.resolve(A)
