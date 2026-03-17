@@ -280,7 +280,9 @@ class Container:
 
             origin = get_origin(hint)
             args = get_args(hint)
-            is_opt = (origin is Union or origin is types.UnionType) and type(None) in args
+            is_opt = (origin is Union or origin is types.UnionType) and type(
+                None
+            ) in args
 
             try:
                 kwargs[name] = await self.resolve(token, id=id)
