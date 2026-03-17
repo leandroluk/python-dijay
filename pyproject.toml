@@ -1,6 +1,6 @@
 [project]
 name = "dijay"
-version = "0.4.0"
+version = "0.5.0"
 description = "The 'remix' your architecture needs: NestJS-style modularity, native async performance, and rigorous typing for Python 3.13+. Less boilerplate, more harmony."
 readme = "README.md"
 requires-python = ">=3.13"
